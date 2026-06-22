@@ -5,8 +5,7 @@
 
 Thank you for the thoughtful brief. Before answering the five questions directly, I want to name something: these aren't really five separate questions. They're one question asked from five angles — *do you actually understand what this is, or do you just see a CMS with three sections?* So I've answered each one directly, but I've also let my reasoning show, because that reasoning is the thing you're actually evaluating.
 
-What follows is part answer sheet, part proposal, part the conversation we'd have over coffee if we were already working together.
-
+What follows is part of that response, part of that proposal, and part of a conversation we had earlier.
 ---
 
 ## 0. First, the three concepts — because everything downstream depends on getting these right
