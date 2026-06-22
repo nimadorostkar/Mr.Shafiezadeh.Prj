@@ -283,5 +283,3 @@ Generic SEO advice is noise here. For a personal knowledge/garden site, the stra
 If I've done my job, this document answered your five questions — but more importantly it showed you the *shape of how I think about a project like this*: content before code, habit before features, durability before cleverness, and honest pushback before easy agreement.
 
 The thing I'd most want you to take away: **this isn't a three-section website. It's one connected mind with three editorial policies, built on infrastructure you fully own, designed so that the most important user — you, six months from now, tired and uninspired — still finds it effortless to feed.**
-
-I'd be glad to turn any section of this into a concrete Phase 0 plan whenever you're ready.
