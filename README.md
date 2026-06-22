@@ -41,7 +41,3 @@ docker compose up   # web · db · redis · celery · nginx
 - **Content outlives code** — Markdown-in-Git is the source of truth; the DB is a rebuildable index.
 - **Capture friction is the enemy** — optimized for adding the 500th note at 11pm.
 - **Longevity is a feature** — clean export path is a first-class requirement.
-
-## License
-
-TBD
