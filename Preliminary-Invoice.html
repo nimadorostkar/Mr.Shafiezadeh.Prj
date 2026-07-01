@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preliminary Proposal — Personal Knowledge Platform</title>
+<style>
+  :root{
+    --ink:#1a1c22; --ink-soft:#3d424c; --muted:#7a8290; --faint:#a7adb8;
+    --line:#e8eaee; --line-soft:#f0f2f5; --soft:#f7f8fa;
+    --accent:#3b5bdb; --accent-2:#2f49b0; --accent-soft:#eef1fd;
+    --green:#15803d; --green-soft:#eafaf0;
+    --paper:#ffffff; --bg:#eceef1;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{
+    margin:0; background:
+      radial-gradient(1200px 600px at 80% -10%, #f3f5ff 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    max-width:860px; margin:40px auto; background:var(--paper);
+    border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 20px 50px -24px rgba(24,28,40,.28), 0 2px 6px rgba(24,28,40,.04);
+    overflow:hidden;
+  }
+  .pad{padding:52px 60px;}
+  h1,h2,h3,h4{margin:0; font-weight:640; letter-spacing:-.015em;}
+  .serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;}
+  .muted{color:var(--muted);} .soft{color:var(--ink-soft);}
+  .small{font-size:12px;} .tiny{font-size:11px;}
+  .kicker{font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; color:var(--accent);}
+
+  /* ===== Masthead ===== */
+  .masthead{
+    background:linear-gradient(135deg,#1a1c22 0%,#23283a 55%,#2f49b0 140%);
+    color:#eef0f6; padding:38px 60px 34px;
+  }
+  .mast-top{display:flex; justify-content:space-between; align-items:flex-start; gap:24px;}
+  .logo{display:flex; align-items:center; gap:12px;}
+  .logo .mark{
+    width:42px; height:42px; border-radius:11px; flex:none;
+    background:linear-gradient(140deg,#5b7bff,#3b5bdb); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px;
+    box-shadow:0 6px 16px -6px rgba(59,91,219,.8);
+  }
+  .logo .who{font-size:16px; font-weight:680; color:#fff; line-height:1.25;}
+  .logo .who small{display:block; font-weight:400; font-size:11.5px; color:#aab3d4; letter-spacing:.02em;}
+  .mast-doc{text-align:right;}
+  .mast-doc .kicker{color:#9fb0ff;}
+  .mast-doc h1{font-size:27px; color:#fff; margin-top:5px;}
+  .mast-meta{margin-top:12px; display:flex; gap:22px; justify-content:flex-end; font-size:12px; color:#c2c8de;}
+  .mast-meta b{display:block; color:#fff; font-weight:600; font-variant-numeric:tabular-nums;}
+
+  /* ===== Parties ===== */
+  .parties{display:flex; gap:18px; margin:-26px 60px 0; position:relative; z-index:2;}
+  .pcard{
+    flex:1; background:var(--paper); border:1px solid var(--line);
+    border-radius:12px; padding:18px 20px; box-shadow:0 8px 20px -14px rgba(24,28,40,.25);
+  }
+  .pcard .lbl{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); font-weight:700;}
+  .pcard .who{font-weight:660; font-size:16px; margin-top:6px;}
+  .pcard .det{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .pcard.perf{border-top:3px solid var(--accent);}
+  .pcard.client{border-top:3px solid var(--green);}
+
+  /* ===== Intro ===== */
+  .intro{margin:30px 0 8px;}
+  .intro .kicker{margin-bottom:8px;}
+  .intro h2{font-size:22px; line-height:1.3;}
+  .intro p{color:var(--ink-soft); font-size:13.5px; margin:12px 0 0; max-width:64ch;}
+  .intro p b{color:var(--ink);}
+
+  /* ===== Tier ===== */
+  .tier{margin-top:38px; border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  .tier-head{display:flex; align-items:center; gap:14px; padding:18px 22px; border-bottom:1px solid var(--line);}
+  .tier-head .idx{
+    width:34px; height:34px; border-radius:9px; flex:none; display:flex; align-items:center;
+    justify-content:center; font-weight:700; font-size:15px; color:#fff;
+  }
+  .tier.eco .tier-head{background:linear-gradient(90deg,var(--green-soft),transparent);}
+  .tier.eco .idx{background:var(--green);}
+  .tier.pro .tier-head{background:linear-gradient(90deg,var(--accent-soft),transparent);}
+  .tier.pro .idx{background:var(--accent);}
+  .tier-head .th-txt{flex:1;}
+  .tier-head .badge{font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;}
+  .tier.eco .badge{color:var(--green);} .tier.pro .badge{color:var(--accent);}
+  .tier-head h3{font-size:17px; margin-top:1px;}
+  .tier-head .chip{
+    font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--paper);
+    border:1px solid var(--line); border-radius:20px; padding:6px 14px; white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .tbl-wrap{padding:6px 8px 12px;}
+  table{width:100%; border-collapse:collapse;}
+  th{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:700; text-align:left; padding:12px 14px 8px;}
+  th.num,td.num{text-align:right;}
+  td{padding:11px 14px; border-top:1px solid var(--line-soft); vertical-align:top;}
+  .grp td{background:transparent; border-top:none; padding:16px 14px 4px;}
+  .grp .gt{font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:var(--ink);}
+  .grp .gt::before{content:""; display:inline-block; width:16px; height:2px; background:var(--accent); margin-right:8px; vertical-align:middle; border-radius:2px;}
+  .tier.eco .grp .gt::before{background:var(--green);}
+  .item .n{font-weight:600; color:var(--ink);}
+  .item .n .num-pre{color:var(--faint); font-weight:700; margin-right:6px;}
+  .item .d{color:var(--muted); font-size:12.5px; margin-top:2px; line-height:1.5;}
+  td.days{font-variant-numeric:tabular-nums; font-weight:640; color:var(--ink); white-space:nowrap;}
+  td.days .u{color:var(--faint); font-weight:400; font-size:11px; margin-left:2px;}
+  tr.sub td{border-top:1px solid var(--line); font-weight:660; padding-top:12px; padding-bottom:14px;}
+  tr.sub .lbl{color:var(--muted); font-weight:600;}
+
+  .tier-foot{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 22px; background:var(--soft); border-top:1px solid var(--line); font-size:12.5px;}
+  .tier-foot .tl{color:var(--ink-soft);}
+  .tier-foot .tl b{color:var(--ink);}
+  .tier-foot .dur{font-weight:660; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .tier-foot .dur .u{color:var(--muted); font-weight:400;}
+
+  /* ===== Timing ===== */
+  .section-title{display:flex; align-items:center; gap:12px; margin:46px 0 16px;}
+  .section-title .kicker{white-space:nowrap;}
+  .section-title .rule{height:1px; background:var(--line); flex:1;}
+
+  .timing{display:flex; gap:18px;}
+  .tcard{flex:1; border:1px solid var(--line); border-radius:12px; padding:20px 22px; background:var(--paper);}
+  .tcard.eco{border-top:3px solid var(--green);}
+  .tcard.pro{border-top:3px solid var(--accent);}
+  .tcard h4{font-size:15px;}
+  .tcard .dur{font-size:12px; color:var(--muted); margin:3px 0 12px; font-variant-numeric:tabular-nums;}
+  .tcard p{margin:0; font-size:12.5px; color:var(--ink-soft);}
+  .tcard ul{margin:12px 0 0; padding:0; list-style:none;}
+  .tcard li{position:relative; padding-left:20px; margin-bottom:7px; font-size:12px; color:var(--ink-soft);}
+  .tcard li::before{content:""; position:absolute; left:2px; top:7px; width:6px; height:6px; border-radius:50%;}
+  .tcard.eco li::before{background:var(--green);}
+  .tcard.pro li::before{background:var(--accent);}
+  .tcard li.best{margin-top:12px; padding-top:10px; border-top:1px dashed var(--line); font-weight:600; color:var(--ink); padding-left:0;}
+  .tcard li.best::before{display:none;}
+
+  /* ===== Terms ===== */
+  .terms{display:flex; gap:26px; flex-wrap:wrap;}
+  .terms .col{flex:1; min-width:250px;}
+  .terms h4{font-size:13px; margin-bottom:10px;}
+  .ms{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .ms td{padding:8px 0; border-bottom:1px solid var(--line-soft);}
+  .ms td.pct{text-align:right; font-weight:660; color:var(--accent); font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .terms.g .ms td.pct{color:var(--green);}
+  .terms ul{margin:0; padding:0; list-style:none;}
+  .terms .col ul li{position:relative; padding-left:18px; margin-bottom:8px; font-size:12.5px; color:var(--ink-soft);}
+  .terms .col ul li::before{content:"–"; position:absolute; left:2px; color:var(--faint);}
+  .terms .col ul li b{color:var(--ink);}
+
+  .foot{margin-top:44px; padding-top:20px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:24px; font-size:11.5px; color:var(--muted);}
+  .foot b{color:var(--ink);}
+  .note{margin-top:14px; font-size:11px; color:var(--muted); line-height:1.6;}
+
+  @media print{
+    body{background:#fff;}
+    .sheet{margin:0; border:none; box-shadow:none; border-radius:0; max-width:none;}
+    .timing,.terms{break-inside:avoid;}
+    tr, tr.sub, .item{break-inside:avoid;}
+    .tier-head, .tier-foot{break-inside:avoid;}
+    .tier-head{break-after:avoid;}
+    .grp{break-after:avoid;}
+    thead{display:table-header-group;}
+  }
+  @media(max-width:660px){
+    .pad,.masthead{padding-left:24px; padding-right:24px;}
+    .parties{margin-left:24px; margin-right:24px; flex-direction:column;}
+    .mast-top,.timing,.terms{flex-direction:column;}
+    .mast-doc,.mast-meta{text-align:left; justify-content:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- ===== Masthead ===== -->
+  <div class="masthead">
+    <div class="mast-top">
+      <div class="logo">
+        <div class="mark">N</div>
+        <div class="who">Nima Dorostkar
+          <small>Product Design &amp; Full-Stack Engineering · Django/DRF · React</small>
+        </div>
+      </div>
+      <div class="mast-doc">
+        <div class="kicker">Proforma · Preliminary</div>
+        <h1 class="serif">Project Proposal</h1>
+        <div class="mast-meta">
+          <span>No.<b>PP-2026-0701</b></span>
+          <span>Issued<b>Jul 1, 2026</b></span>
+          <span>Valid<b>10 days</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Parties ===== -->
+  <div class="parties">
+    <div class="pcard client">
+      <div class="lbl">Prepared for — Client</div>
+      <div class="who">Nima Shafiezadeh</div>
+      <div class="det">Project Owner — Personal Knowledge Platform</div>
+    </div>
+    <div class="pcard perf">
+      <div class="lbl">Prepared by — Performer</div>
+      <div class="who">Nima Dorostkar</div>
+      <div class="det">Independent Contractor · nimadorostkar97@gmail.com</div>
+    </div>
+  </div>
+
+  <div class="pad">
+
+    <!-- ===== Intro ===== -->
+    <div class="intro">
+      <div class="kicker">The engagement</div>
+      <h2 class="serif">Design &amp; development of a personal knowledge platform</h2>
+      <p>
+        A content-first system — <b>Personal Knowledge · Digital Garden · Personal Archive</b> — built as one content graph
+        under three editorial policies, on Django + DRF, PostgreSQL, React, and Celery/Redis, containerized with Docker and
+        deployed to a VPS. This preliminary proposal outlines two engagement paths — a lean <b>Economic</b> build first, and a
+        complete <b>Professional</b> build — described by <b>scope and timeline</b>. Effort is shown in working days; commercial
+        figures follow separately at contract stage.
+      </p>
+    </div>
+
+    <!-- ============ 1 · ECONOMIC ============ -->
+    <div class="tier eco">
+      <div class="tier-head">
+        <div class="idx">1</div>
+        <div class="th-txt">
+          <div class="badge">Option 1 · Recommended start</div>
+          <h3>Economic — Essentials</h3>
+        </div>
+        <div class="chip">85 working days</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:82%">Phase / Deliverable</th><th class="num" style="width:18%">Effort</th></tr>
+          </thead>
+          <tbody>
+            <tr class="grp"><td colspan="2"><span class="gt">Product Design</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">1</span>Analysis &amp; Research</div><div class="d">Focused requirements &amp; core information architecture</div></td><td class="days">7<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">2</span>Initial Design</div><div class="d">Key screens &amp; flows, lightweight wireframes</div></td><td class="days">10<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">3</span>Finalizing the Design</div><div class="d">Practical UI direction ready to build against</div></td><td class="days">8<span class="u">d</span></td></tr>
+            <tr class="sub"><td class="lbl">Design subtotal</td><td class="days num">25<span class="u">d</span></td></tr>
+
+            <tr class="grp"><td colspan="2"><span class="gt">Product Development</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">1</span>Backend Development</div><div class="d">Models, business logic, Django/DRF APIs — the content graph &amp; policy layer</div></td><td class="days">20<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">2</span>Frontend Development</div><div class="d">UI implementation &amp; state management for core screens</div></td><td class="days">18<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">3</span>Integrations</div><div class="d">Essential third-party services, payments, webhooks</div></td><td class="days">7<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">4</span>Code Review</div><div class="d">Standards &amp; quality gates on delivered code</div></td><td class="days">5<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">5</span>Bug Fixes &amp; Support</div><div class="d">Post-delivery stabilization window</div></td><td class="days">4<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">6</span>Deployment &amp; Maintenance</div><div class="d">Docker + VPS/Nginx deploy and basic upkeep</div></td><td class="days">6<span class="u">d</span></td></tr>
+            <tr class="sub"><td class="lbl">Development subtotal</td><td class="days num">60<span class="u">d</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tier-foot">
+        <div class="tl"><b>Lean, essentials-only</b> — a fast path to a working product you can use daily.</div>
+        <div class="dur">≈ 17 weeks <span class="u">· 4 months</span></div>
+      </div>
+    </div>
+
+    <!-- ============ 2 · PROFESSIONAL ============ -->
+    <div class="tier pro">
+      <div class="tier-head">
+        <div class="idx">2</div>
+        <div class="th-txt">
+          <div class="badge">Option 2 · Complete build</div>
+          <h3>Professional — Full Scope</h3>
+        </div>
+        <div class="chip">129 working days</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:82%">Phase / Deliverable</th><th class="num" style="width:18%">Effort</th></tr>
+          </thead>
+          <tbody>
+            <tr class="grp"><td colspan="2"><span class="gt">Product Design</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">1</span>Discovery &amp; Research</div><div class="d">User research (interviews, surveys, observation) · market/competitor analysis &amp; positioning · personas · Jobs-to-be-Done (JTBD) · problem definition</div></td><td class="days">6<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">2</span>Strategy &amp; Definition</div><div class="d">Product vision &amp; goals (north star, success metrics) · value proposition · scope &amp; prioritization (MoSCoW, RICE, roadmap) · user stories &amp; requirements</div></td><td class="days">4<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">3</span>Information Architecture</div><div class="d">Content structure · user flows · sitemap / navigation model · task flows &amp; journey maps</div></td><td class="days">4<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">4</span>Interaction Design (UX)</div><div class="d">Low-fidelity wireframes · clickable prototypes (Figma) · interaction patterns (states, transitions, micro-interactions) · usability testing &amp; iteration</div></td><td class="days">8<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">5</span>Visual Design (UI)</div><div class="d">Design system (color, typography, spacing, tokens) · component library · high-fidelity mockups · responsive / mobile-first · accessibility (WCAG contrast, keyboard, screen readers)</div></td><td class="days">13<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">6</span>Handoff &amp; Validation</div><div class="d">Design specs / handoff (tokens, measurements, assets for devs) · design QA vs. implementation · feedback loops (post-launch analytics, heatmaps, iteration)</div></td><td class="days">4<span class="u">d</span></td></tr>
+            <tr class="sub"><td class="lbl">Design subtotal</td><td class="days num">39<span class="u">d</span></td></tr>
+
+            <tr class="grp"><td colspan="2"><span class="gt">Product Development</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">1</span>Planning &amp; Setup</div><div class="d">Technical requirements (specs → engineering tasks) · architecture decision (monolith vs microservices, stack selection) · tech stack (languages, frameworks, DB, infra) · environment setup (repos, branching, tooling) · task breakdown (epics → stories → tasks, estimation)</div></td><td class="days">6<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">2</span>System Design</div><div class="d">Database design (schema, relationships/ERD, indexing) · API design (endpoints, contracts, request/response) · architecture (services, queues, caching, data flow) · security design (auth, authorization, data protection)</div></td><td class="days">10<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">3</span>Implementation</div><div class="d">Backend (models, business logic, Django/DRF APIs) · frontend (UI, state management) · integrations (third-party services, payments, webhooks) · async/background jobs (Celery, queues, workers) · code review (standards, quality gates)</div></td><td class="days">44<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">4</span>Testing / QA</div><div class="d">Unit tests · integration tests · API tests · end-to-end (full user scenarios) · performance/load testing · security testing (vulnerability scans)</div></td><td class="days">14<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">5</span>Deployment</div><div class="d">Containerization (Docker) · CI/CD pipeline (build, test, deploy) · infrastructure (cloud/VPS, Nginx, DB setup) · release strategy (blue-green, canary, feature flags) · environment config (staging vs production, secrets management)</div></td><td class="days">8<span class="u">d</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">6</span>Operations &amp; Maintenance</div><div class="d">Monitoring &amp; logging (Prometheus, Grafana, error tracking) · bug fixes &amp; support · performance optimization (profiling, scaling) · security patching &amp; updates · iteration (new features from feedback &amp; metrics)<br><span class="tiny">Initial engagement block; ongoing beyond launch via monthly retainer.</span></div></td><td class="days">8<span class="u">d</span></td></tr>
+            <tr class="sub"><td class="lbl">Development subtotal</td><td class="days num">90<span class="u">d</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tier-foot">
+        <div class="tl"><b>Complete, durable build</b> — full research, design system, testing, CI/CD and operations for the long term.</div>
+        <div class="dur">≈ 25–26 weeks <span class="u">· 6 months</span></div>
+      </div>
+    </div>
+
+    <!-- ============ TIMING ============ -->
+    <div class="section-title">
+      <span class="kicker">The two cases, explained by timing</span>
+      <span class="rule"></span>
+    </div>
+    <div class="timing">
+      <div class="tcard eco">
+        <h4>1 · Economic</h4>
+        <div class="dur">≈ 17 weeks · 4 months (solo, ~5 days/week)</div>
+        <p>A lean path to a working product. It compresses design to the essentials and ships the core backend + frontend, key integrations, and a basic deploy — trading extensive test automation, a formal design system, and full ops tooling for speed. Ideal to validate the idea in real use first.</p>
+        <ul>
+          <li>Core content graph &amp; three-policy backend (Django/DRF)</li>
+          <li>Frontend for the primary screens</li>
+          <li>Essential integrations + code review + short support window</li>
+          <li>Docker + VPS deploy; lighter testing &amp; ops</li>
+          <li class="best">Best to launch fast, prove daily use, then grow into Option 2.</li>
+        </ul>
+      </div>
+      <div class="tcard pro">
+        <h4>2 · Professional</h4>
+        <div class="dur">≈ 25–26 weeks · 6 months (solo, ~5 days/week)</div>
+        <p>The complete, durable build. Time goes up front into discovery, UX research, a real design system, and formal system design, then through a full testing suite, CI/CD, monitoring, and an operations window — depth now for an extensible, low-maintenance platform for years, matching the project's "quality over speed, longevity is a feature" principles.</p>
+        <ul>
+          <li>Full discovery → strategy → IA → UX → UI design track</li>
+          <li>Design system, component library &amp; accessibility</li>
+          <li>Formal DB / API / security design before coding</li>
+          <li>Complete automated testing (unit → E2E, performance, security)</li>
+          <li>CI/CD, release strategy, monitoring &amp; observability</li>
+          <li class="best">Best when this is the long-term home of your digital presence.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">
+      Both estimates assume a single practitioner working ~5 days/week with timely client feedback; elapsed calendar time may
+      extend with review cycles. The scopes are additive — starting with Option 1 and later adding the remaining Professional
+      deliverables reaches the same end state.
+    </p>
+
+    <!-- ============ MILESTONES / TERMS ============ -->
+    <div class="section-title">
+      <span class="kicker">Milestones &amp; terms</span>
+      <span class="rule"></span>
+    </div>
+    <div class="terms g">
+      <div class="col">
+        <h4>Payment model — per completed phase</h4>
+        <table class="ms">
+          <tr><td><b>Mobilization deposit</b> — on signing, before work begins</td><td class="pct">20%</td></tr>
+          <tr><td>Each phase — invoiced on completion &amp; acceptance</td><td class="pct">80%</td></tr>
+        </table>
+        <p class="note" style="margin-top:10px;">
+          Applies to <b>both options</b>. A 20% deposit starts the engagement; the remaining 80% is billed
+          phase by phase as each phase is delivered and accepted, pro-rated by that phase's share of the total
+          working days. No large lump sum at the end — you pay for progress as it lands.
+        </p>
+      </div>
+      <div class="col">
+        <h4>Notes</h4>
+        <ul>
+          <li>Due to the constant change in Iranian prices, all figures are quoted in <b>US dollars (USD)</b>.</li>
+          <li>This is a <b>preliminary proposal</b> — scope &amp; timeline only; commercial terms follow at contract stage.</li>
+          <li>Estimates are <b>day-based</b>; scope changes are re-scoped before work begins.</li>
+          <li>Third-party costs (VPS, domain, licenses, paid APIs) are <b>out of scope</b> and arranged by the client.</li>
+          <li>Maintenance beyond the included window: optional <b>monthly retainer</b>.</li>
+          <li>Source code, designs &amp; content <b>belong to the client</b> on completion.</li>
+          <li><b>Two review rounds</b> included per major deliverable.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div><b>Nima Dorostkar</b> — Design &amp; Development<br>nimadorostkar97@gmail.com</div>
+      <div style="text-align:right;">Proposal <b>PP-2026-0701</b><br>Issued July 1, 2026 · for Nima Shafiezadeh</div>
+    </div>
+
+  </div><!-- /pad -->
+</div>
+</body>
+</html>

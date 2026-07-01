@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Invoice — Product Design</title>
+<style>
+  :root{
+    --ink:#1a1c22; --ink-soft:#3d424c; --muted:#7a8290; --faint:#a7adb8;
+    --line:#e8eaee; --line-soft:#f0f2f5; --soft:#f7f8fa;
+    --accent:#3b5bdb; --accent-2:#2f49b0; --accent-soft:#eef1fd;
+    --green:#15803d; --green-soft:#eafaf0;
+    --paper:#ffffff; --bg:#eceef1;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{
+    margin:0; background:radial-gradient(1200px 600px at 80% -10%, #f3f5ff 0%, transparent 60%), var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .sheet{max-width:860px; margin:40px auto; background:var(--paper); border:1px solid var(--line); border-radius:14px;
+    box-shadow:0 20px 50px -24px rgba(24,28,40,.28), 0 2px 6px rgba(24,28,40,.04); overflow:hidden;}
+  .pad{padding:52px 60px;}
+  h1,h2,h3,h4{margin:0; font-weight:640; letter-spacing:-.015em;}
+  .serif{font-family:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;}
+  .muted{color:var(--muted);} .soft{color:var(--ink-soft);}
+  .small{font-size:12px;} .tiny{font-size:11px;} .mono{font-variant-numeric:tabular-nums;}
+  .kicker{font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; color:var(--accent);}
+
+  /* Masthead */
+  .masthead{background:linear-gradient(135deg,#1a1c22 0%,#23283a 55%,#2f49b0 140%); color:#eef0f6; padding:38px 60px 34px;}
+  .mast-top{display:flex; justify-content:space-between; align-items:flex-start; gap:24px;}
+  .logo{display:flex; align-items:center; gap:12px;}
+  .logo .mark{width:42px; height:42px; border-radius:11px; flex:none; background:linear-gradient(140deg,#5b7bff,#3b5bdb);
+    color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; box-shadow:0 6px 16px -6px rgba(59,91,219,.8);}
+  .logo .who{font-size:16px; font-weight:680; color:#fff; line-height:1.25;}
+  .logo .who small{display:block; font-weight:400; font-size:11.5px; color:#aab3d4; letter-spacing:.02em;}
+  .mast-doc{text-align:right;}
+  .mast-doc .kicker{color:#9fb0ff;}
+  .mast-doc h1{font-size:27px; color:#fff; margin-top:5px;}
+  .mast-meta{margin-top:12px; display:flex; gap:22px; justify-content:flex-end; font-size:12px; color:#c2c8de;}
+  .mast-meta b{display:block; color:#fff; font-weight:600; font-variant-numeric:tabular-nums;}
+
+  /* Parties */
+  .parties{display:flex; gap:18px; margin:-26px 60px 0; position:relative; z-index:2;}
+  .pcard{flex:1; background:var(--paper); border:1px solid var(--line); border-radius:12px; padding:18px 20px; box-shadow:0 8px 20px -14px rgba(24,28,40,.25);}
+  .pcard .lbl{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint); font-weight:700;}
+  .pcard .who{font-weight:660; font-size:16px; margin-top:6px;}
+  .pcard .det{color:var(--muted); font-size:12.5px; margin-top:2px;}
+  .pcard.perf{border-top:3px solid var(--accent);}
+  .pcard.client{border-top:3px solid var(--green);}
+
+  .intro{margin:30px 0 8px;}
+  .intro .kicker{margin-bottom:8px;}
+  .intro h2{font-size:22px; line-height:1.3;}
+  .intro p{color:var(--ink-soft); font-size:13.5px; margin:12px 0 0; max-width:64ch;}
+  .intro p b{color:var(--ink);}
+
+  /* Tier */
+  .tier{margin-top:34px; border:1px solid var(--line); border-radius:14px; overflow:hidden;}
+  .tier-head{display:flex; align-items:center; gap:14px; padding:18px 22px; border-bottom:1px solid var(--line);}
+  .tier-head .idx{width:34px; height:34px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; color:#fff;}
+  .tier.eco .tier-head{background:linear-gradient(90deg,var(--green-soft),transparent);}
+  .tier.eco .idx{background:var(--green);}
+  .tier.pro .tier-head{background:linear-gradient(90deg,var(--accent-soft),transparent);}
+  .tier.pro .idx{background:var(--accent);}
+  .tier-head .th-txt{flex:1;}
+  .tier-head .badge{font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;}
+  .tier.eco .badge{color:var(--green);} .tier.pro .badge{color:var(--accent);}
+  .tier-head h3{font-size:17px; margin-top:1px;}
+  .tier-head .chip{font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--paper); border:1px solid var(--line); border-radius:20px; padding:6px 14px; white-space:nowrap; font-variant-numeric:tabular-nums;}
+
+  .tbl-wrap{padding:6px 8px 12px;}
+  table{width:100%; border-collapse:collapse;}
+  th{font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); font-weight:700; text-align:left; padding:12px 14px 8px;}
+  th.num,td.num{text-align:right;}
+  td{padding:11px 14px; border-top:1px solid var(--line-soft); vertical-align:top;}
+  .grp td{background:transparent; border-top:none; padding:16px 14px 4px;}
+  .grp .gt{font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-weight:700; color:var(--ink);}
+  .grp .gt::before{content:""; display:inline-block; width:16px; height:2px; background:var(--accent); margin-right:8px; vertical-align:middle; border-radius:2px;}
+  .tier.eco .grp .gt::before{background:var(--green);}
+  .item .n{font-weight:600; color:var(--ink);}
+  .item .n .num-pre{color:var(--faint); font-weight:700; margin-right:6px;}
+  .item .d{color:var(--muted); font-size:12.5px; margin-top:2px; line-height:1.5;}
+  td.days,td.amt{font-variant-numeric:tabular-nums; white-space:nowrap;}
+  td.days{font-weight:640; color:var(--ink);} td.days .u{color:var(--faint); font-weight:400; font-size:11px; margin-left:2px;}
+  td.amt{font-weight:640; color:var(--ink);}
+  tr.sub td{border-top:1px solid var(--line); font-weight:660; padding-top:12px; padding-bottom:14px;}
+  tr.sub .lbl{color:var(--muted); font-weight:600;}
+
+  .tier-foot{display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 22px; background:var(--soft); border-top:1px solid var(--line); font-size:13px;}
+  .tier-foot .tl{color:var(--ink-soft);} .tier-foot .tl b{color:var(--ink);}
+  .tier-foot .tot{display:flex; align-items:baseline; gap:10px;}
+  .tier-foot .tot .tl2{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700;}
+  .tier-foot .tot .amt{font-size:20px; font-weight:700; font-variant-numeric:tabular-nums;}
+  .tier.eco .tier-foot .tot .amt{color:var(--green);}
+  .tier.pro .tier-foot .tot .amt{color:var(--accent);}
+
+  /* Summary */
+  .section-title{display:flex; align-items:center; gap:12px; margin:44px 0 16px;}
+  .section-title .kicker{white-space:nowrap;}
+  .section-title .rule{height:1px; background:var(--line); flex:1;}
+  .cmp{border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+  .cmp table{margin:0;}
+  .cmp th{padding:12px 16px; background:var(--soft);}
+  .cmp td{padding:13px 16px; vertical-align:middle;}
+  .cmp .num{font-variant-numeric:tabular-nums;}
+  .pill{display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:20px;}
+  .pill.eco{background:var(--green-soft); color:var(--green);} .pill.pro{background:var(--accent-soft); color:var(--accent);}
+  .cmp tr.tot-row td{border-top:2px solid var(--ink); font-weight:700;}
+
+  .terms{display:flex; gap:26px; flex-wrap:wrap; margin-top:8px;}
+  .terms .col{flex:1; min-width:250px;}
+  .terms h4{font-size:13px; margin-bottom:10px;}
+  .ms{width:100%; border-collapse:collapse; font-size:12.5px;}
+  .ms td{padding:8px 0; border-bottom:1px solid var(--line-soft);}
+  .ms td.rt{text-align:right; font-weight:660; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .terms ul{margin:0; padding:0; list-style:none;}
+  .terms .col ul li{position:relative; padding-left:18px; margin-bottom:8px; font-size:12.5px; color:var(--ink-soft);}
+  .terms .col ul li::before{content:"–"; position:absolute; left:2px; color:var(--faint);}
+  .terms .col ul li b{color:var(--ink);}
+
+  .foot{margin-top:40px; padding-top:20px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:24px; font-size:11.5px; color:var(--muted);}
+  .foot b{color:var(--ink);}
+  .note{margin-top:12px; font-size:11px; color:var(--muted); line-height:1.6;}
+
+  @media print{
+    body{background:#fff;}
+    .sheet{margin:0; border:none; box-shadow:none; border-radius:0; max-width:none;}
+    .timing,.terms,.cmp{break-inside:avoid;}
+    tr, tr.sub, .item{break-inside:avoid;}
+    .tier-head,.tier-foot{break-inside:avoid;} .tier-head{break-after:avoid;} .grp{break-after:avoid;}
+    thead{display:table-header-group;}
+  }
+  @media(max-width:660px){
+    .pad,.masthead{padding-left:24px; padding-right:24px;}
+    .parties{margin-left:24px; margin-right:24px; flex-direction:column;}
+    .mast-top,.terms{flex-direction:column;} .mast-doc,.mast-meta{text-align:left; justify-content:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- Masthead -->
+  <div class="masthead">
+    <div class="mast-top">
+      <div class="logo">
+        <div class="mark">N</div>
+        <div class="who">Nima Dorostkar<small>Product Design &amp; Full-Stack Engineering · Django/DRF · React</small></div>
+      </div>
+      <div class="mast-doc">
+        <div class="kicker">Proforma · Product Design</div>
+        <h1 class="serif">Invoice</h1>
+        <div class="mast-meta">
+          <span>No.<b>DI-2026-0701</b></span>
+          <span>Issued<b>Jul 1, 2026</b></span>
+          <span>Valid<b>10 days</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Parties -->
+  <div class="parties">
+    <div class="pcard client">
+      <div class="lbl">Billed to — Client</div>
+      <div class="who">Nima Shafiezadeh</div>
+      <div class="det">Project Owner — Personal Knowledge Platform</div>
+    </div>
+    <div class="pcard perf">
+      <div class="lbl">From — Performer</div>
+      <div class="who">Nima Dorostkar</div>
+      <div class="det">Independent Contractor · nimadorostkar97@gmail.com</div>
+    </div>
+  </div>
+
+  <div class="pad">
+
+    <div class="intro">
+      <div class="kicker">Scope of this invoice</div>
+      <h2 class="serif">Product Design — Economic &amp; Professional</h2>
+      <p>
+        This invoice covers the <b>Product Design work only</b> for the Personal Knowledge Platform, offered as a
+        <b>fixed package price</b> for each engagement tier so you can choose the depth that fits. Estimated effort is shown
+        in working days; per-phase amounts break down the fixed total. Development, deployment, and operations are quoted separately.
+      </p>
+    </div>
+
+    <!-- ===== ECONOMIC — Product Design ===== -->
+    <div class="tier eco">
+      <div class="tier-head">
+        <div class="idx">1</div>
+        <div class="th-txt">
+          <div class="badge">Option 1 · Essentials</div>
+          <h3>Economic — Product Design</h3>
+        </div>
+        <div class="chip">Fixed package · 25 days</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:64%">Phase / Deliverable</th><th class="num" style="width:15%">Est. days</th><th class="num" style="width:21%">Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr class="grp"><td colspan="3"><span class="gt">Product Design</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">1</span>Analysis &amp; Research</div><div class="d">Focused requirements &amp; core information architecture</div></td><td class="days">7<span class="u">d</span></td><td class="amt">$104</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">2</span>Initial Design</div><div class="d">Key screens &amp; flows, lightweight wireframes</div></td><td class="days">10<span class="u">d</span></td><td class="amt">$148</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">3</span>Finalizing the Design</div><div class="d">Practical UI direction ready to build against</div></td><td class="days">8<span class="u">d</span></td><td class="amt">$118</td></tr>
+            <tr class="sub"><td class="lbl">Design subtotal</td><td class="days num">25<span class="u">d</span></td><td class="amt num">$370</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tier-foot">
+        <div class="tl"><b>Lean design track</b> — the essentials to start building with confidence.</div>
+        <div class="tot"><span class="tl2">Total</span><span class="amt">$370</span></div>
+      </div>
+    </div>
+
+    <!-- ===== PROFESSIONAL — Product Design ===== -->
+    <div class="tier pro">
+      <div class="tier-head">
+        <div class="idx">2</div>
+        <div class="th-txt">
+          <div class="badge">Option 2 · Complete</div>
+          <h3>Professional — Product Design</h3>
+        </div>
+        <div class="chip">Fixed package · 39 days</div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th style="width:64%">Phase / Deliverable</th><th class="num" style="width:15%">Est. days</th><th class="num" style="width:21%">Amount</th></tr>
+          </thead>
+          <tbody>
+            <tr class="grp"><td colspan="3"><span class="gt">Product Design</span></td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">1</span>Discovery &amp; Research</div><div class="d">User research (interviews, surveys, observation) · market/competitor analysis &amp; positioning · personas · Jobs-to-be-Done (JTBD) · problem definition</div></td><td class="days">6<span class="u">d</span></td><td class="amt">$154</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">2</span>Strategy &amp; Definition</div><div class="d">Product vision &amp; goals (north star, success metrics) · value proposition · scope &amp; prioritization (MoSCoW, RICE, roadmap) · user stories &amp; requirements</div></td><td class="days">4<span class="u">d</span></td><td class="amt">$103</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">3</span>Information Architecture</div><div class="d">Content structure · user flows · sitemap / navigation model · task flows &amp; journey maps</div></td><td class="days">4<span class="u">d</span></td><td class="amt">$103</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">4</span>Interaction Design (UX)</div><div class="d">Low-fidelity wireframes · clickable prototypes (Figma) · interaction patterns (states, transitions, micro-interactions) · usability testing &amp; iteration</div></td><td class="days">8<span class="u">d</span></td><td class="amt">$205</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">5</span>Visual Design (UI)</div><div class="d">Design system (color, typography, spacing, tokens) · component library · high-fidelity mockups · responsive / mobile-first · accessibility (WCAG contrast, keyboard, screen readers)</div></td><td class="days">13<span class="u">d</span></td><td class="amt">$333</td></tr>
+            <tr class="item"><td><div class="n"><span class="num-pre">6</span>Handoff &amp; Validation</div><div class="d">Design specs / handoff (tokens, measurements, assets for devs) · design QA vs. implementation · feedback loops (post-launch analytics, heatmaps, iteration)</div></td><td class="days">4<span class="u">d</span></td><td class="amt">$102</td></tr>
+            <tr class="sub"><td class="lbl">Design subtotal</td><td class="days num">39<span class="u">d</span></td><td class="amt num">$1,000</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tier-foot">
+        <div class="tl"><b>Complete design track</b> — research-led, full UX &amp; UI system, dev-ready handoff.</div>
+        <div class="tot"><span class="tl2">Total</span><span class="amt">$1,000</span></div>
+      </div>
+    </div>
+
+    <!-- ===== Summary ===== -->
+    <div class="section-title"><span class="kicker">Summary</span><span class="rule"></span></div>
+    <div class="cmp">
+      <table>
+        <thead>
+          <tr><th style="width:58%">Option</th><th class="num">Est. effort</th><th class="num">Total</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="pill eco">Option 1</span> &nbsp;Economic — Product Design</td><td class="num">25 days</td><td class="num"><b>$370</b></td></tr>
+          <tr><td><span class="pill pro">Option 2</span> &nbsp;Professional — Product Design</td><td class="num">39 days</td><td class="num"><b>$1,000</b></td></tr>
+          <tr class="tot-row"><td class="muted">Difference (upgrade to Professional)</td><td class="num muted">+14 days</td><td class="num">+$630</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ===== Payment & terms ===== -->
+    <div class="section-title"><span class="kicker">Payment &amp; terms</span><span class="rule"></span></div>
+    <div class="terms">
+      <div class="col">
+        <h4>Payment — per completed phase</h4>
+        <table class="ms">
+          <tr><td><b>Mobilization deposit</b> — on signing</td><td class="rt">20%</td></tr>
+          <tr><td>Economic — deposit / balance on delivery</td><td class="rt">$74 / $296</td></tr>
+          <tr><td>Professional — deposit / balance on delivery</td><td class="rt">$200 / $800</td></tr>
+        </table>
+        <p class="note">A 20% deposit starts the work; the remaining 80% is billed phase by phase as each design phase is delivered and accepted.</p>
+      </div>
+      <div class="col">
+        <h4>Notes</h4>
+        <ul>
+          <li>Due to the constant change in Iranian prices, all figures are quoted in <b>US dollars (USD)</b>.</li>
+          <li>Covers <b>Product Design only</b>; development, testing, deployment &amp; operations are billed separately.</li>
+          <li>Each tier is a <b>fixed package price</b>; day counts are estimates, not the billing basis.</li>
+          <li><b>Two review rounds</b> included per design phase.</li>
+          <li>All design source files &amp; assets <b>belong to the client</b> on final payment.</li>
+          <li>Quote valid <b>10 days</b> from the issue date.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot">
+      <div><b>Nima Dorostkar</b> — Product Design<br>nimadorostkar97@gmail.com</div>
+      <div style="text-align:right;">Invoice <b>DI-2026-0701</b><br>Issued July 1, 2026 · for Nima Shafiezadeh</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
