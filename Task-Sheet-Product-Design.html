@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task Sheet — Personal Knowledge Platform · Product Design</title>
+<style>
+  :root{
+    --paper:#faf8f3; --paper-2:#f3f0e8; --ink:#1c1b19; --ink-soft:#54514b;
+    --line:#e2ddd1; --line-2:#d3ccbc; --accent:#2f7d5b; --accent-soft:#e4f0ea;
+    --amber:#b5852b; --blue:#3b6ea5; --rose:#a8506a; --violet:#6b5aa8; --slate:#5a6672;
+    --shadow:0 1px 2px rgba(28,27,25,.05),0 8px 24px rgba(28,27,25,.06);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",ui-monospace,"Cascadia Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 28px 80px}
+  a{color:var(--accent);text-decoration:none}
+  h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.15;margin:0}
+  .eyebrow{font-family:var(--sans);font-size:11.5px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 12px}
+
+  /* Header */
+  header{border-bottom:1px solid var(--line-2);padding-bottom:34px;margin-bottom:36px}
+  h1{font-size:38px;margin-bottom:10px}
+  .lede{font-size:17px;color:var(--ink-soft);max-width:60ch;margin:0}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;
+    overflow:hidden;margin-top:30px}
+  .meta-cell{background:var(--paper);padding:16px 18px}
+  .meta-cell .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:5px}
+  .meta-cell .v{font-size:14.5px;font-weight:600}
+  .meta-cell .v small{display:block;font-weight:400;color:var(--ink-soft);font-size:12.5px;margin-top:2px}
+
+  /* KPI */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:0 0 40px}
+  .kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+  .kpi .n{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1}
+  .kpi .l{font-size:12.5px;color:var(--ink-soft);margin-top:7px}
+  .kpi .n .u{font-size:15px;color:var(--ink-soft);font-weight:400}
+
+  section{margin-bottom:46px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px;flex-wrap:wrap}
+  .sec-head h2{font-size:23px}
+  .sec-head p{margin:0;color:var(--ink-soft);font-size:13.5px}
+
+  /* Gantt */
+  .gantt{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+  .gantt .weekrow{display:grid;grid-template-columns:210px 1fr;background:var(--paper-2);border-bottom:1px solid var(--line)}
+  .gantt .weekrow .corner{padding:9px 14px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .gantt .weeks{display:grid;grid-template-columns:repeat(10,1fr)}
+  .gantt .weeks span{font-size:10.5px;color:var(--ink-soft);text-align:center;padding:9px 2px;border-left:1px solid var(--line);font-weight:600}
+  .grow{display:grid;grid-template-columns:210px 1fr;border-bottom:1px solid var(--line);align-items:center}
+  .grow:last-child{border-bottom:none}
+  .grow .lab{padding:11px 14px;font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .grow .track{position:relative;height:46px;background:
+    repeating-linear-gradient(90deg,transparent,transparent calc(10% - 1px),var(--line) calc(10% - 1px),var(--line) 10%)}
+  .bar{position:absolute;top:11px;height:24px;border-radius:6px;display:flex;align-items:center;
+    padding:0 9px;font-size:11px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+  /* Phase table */
+  .phase{margin-bottom:26px;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:var(--paper)}
+  .phase-head{display:flex;align-items:center;gap:13px;padding:15px 20px;border-bottom:1px solid var(--line);background:var(--paper-2)}
+  .phase-head .pnum{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:var(--ink);
+    width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none}
+  .phase-head h3{font-size:17px}
+  .phase-head .prange{margin-left:auto;font-size:12px;color:var(--ink-soft);text-align:right;white-space:nowrap}
+  .phase-head .prange b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse}
+  th{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);
+    text-align:left;padding:10px 14px;font-weight:600;border-bottom:1px solid var(--line);background:var(--paper)}
+  td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--paper-2)}
+  .tid{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);white-space:nowrap}
+  .ttask{font-weight:600}
+  .tdeliv{color:var(--ink-soft);font-size:12.5px;margin-top:3px}
+  .col-date{white-space:nowrap;font-size:12.5px}
+  .col-date small{display:block;color:var(--ink-soft)}
+  .dur{display:inline-block;font-family:var(--mono);font-size:11.5px;background:var(--paper-2);
+    border:1px solid var(--line);border-radius:5px;padding:1px 7px;color:var(--ink-soft)}
+  .dep{font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .chk{width:18px;height:18px;accent-color:var(--accent);cursor:pointer}
+  th.c,td.c{text-align:center}
+  tr.done td{opacity:.5}
+  tr.done .ttask{text-decoration:line-through}
+
+  /* progress */
+  .progbar{display:flex;align-items:center;gap:14px;margin-top:6px}
+  .track2{flex:1;height:9px;background:var(--line);border-radius:99px;overflow:hidden}
+  .fill2{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .35s ease}
+  .pct{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);min-width:42px;text-align:right}
+
+  /* milestones */
+  .miles{display:grid;gap:10px}
+  .mile{display:grid;grid-template-columns:26px 1fr auto;gap:14px;align-items:center;
+    background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--accent);
+    border-radius:10px;padding:13px 18px;box-shadow:var(--shadow)}
+  .mile .star{color:var(--accent);font-size:18px}
+  .mile .mname{font-weight:600;font-size:14px}
+  .mile .mname small{display:block;color:var(--ink-soft);font-weight:400;font-size:12px;margin-top:2px}
+  .mile .mdate{font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);white-space:nowrap;text-align:right}
+
+  /* payment */
+  .pay-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;
+    background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .ps-cell{background:var(--paper);padding:15px 18px}
+  .ps-l{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:5px}
+  .ps-n{font-family:var(--serif);font-size:26px;font-weight:600;line-height:1}
+  .ps-n.paid{color:var(--accent)} .ps-n.prog{color:var(--amber)} .ps-n.out{color:var(--ink-soft)}
+  .pay-amt{font-family:var(--mono);font-weight:600;font-size:14px}
+  .pay-foot td{background:var(--paper-2);font-size:14px}
+  .pnum-sm{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft)}
+  .status-btn{font-family:var(--sans);font-size:12px;font-weight:600;border:1px solid var(--line-2);
+    border-radius:99px;padding:5px 13px 5px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+    background:var(--paper);color:var(--ink-soft);transition:all .15s;white-space:nowrap;user-select:none}
+  .status-btn:hover{border-color:var(--ink-soft)}
+  .status-btn .sdot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+  .status-btn.s-paid{background:var(--accent-soft);border-color:#bcdccc;color:var(--accent)}
+  .status-btn.s-prog{background:#fbf1dc;border-color:#ecd9ac;color:var(--amber)}
+  .status-btn.s-unpaid{color:var(--ink-soft)}
+  tr.row-paid{background:linear-gradient(90deg,var(--accent-soft),transparent 60%)}
+  .note{background:var(--accent-soft);border:1px solid #cfe4da;border-radius:10px;padding:15px 18px;
+    font-size:13px;color:#2a5c46;margin-top:26px}
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line-2);
+    color:var(--ink-soft);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  @media (max-width:720px){
+    .wrap{padding:32px 16px 60px}
+    h1{font-size:29px}
+    .gantt .weekrow,.grow{grid-template-columns:120px 1fr}
+    .gantt .weeks span{font-size:8px}
+    .grow .lab{font-size:11px;padding:9px}
+    th,td{padding:9px 8px;font-size:12.5px}
+    .hide-sm{display:none}
+  }
+  @media print{
+    body{background:#fff} .chk{display:none} .note{background:#f4f4f4}
+    .phase,.gantt,.kpi,.mile{box-shadow:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Task Sheet &amp; Execution Schedule · Product Design</p>
+    <h1>Personal Knowledge Platform</h1>
+    <p class="lede">A detailed, day-by-day product-design plan for the personal knowledge · digital garden · personal archive platform — one connected content graph with three editorial policies, executed with editorial-minimalist craft.</p>
+
+    <div class="meta-grid">
+      <div class="meta-cell"><div class="k">Billed to — Client</div><div class="v">Nima Shafiezadeh<small>Project Owner</small></div></div>
+      <div class="meta-cell"><div class="k">From — Performer</div><div class="v">Nima Dorostkar<small>Independent Contractor · nimadorostkar97@gmail.com</small></div></div>
+      <div class="meta-cell"><div class="k">Scope</div><div class="v">Product Design only<small>Research → IA → UX → UI → Handoff</small></div></div>
+      <div class="meta-cell"><div class="k">Duration</div><div class="v">50 working days<small>Mon 13 Jul → Fri 18 Sep 2026</small></div></div>
+      <div class="meta-cell"><div class="k">Total</div><div class="v">$370<small>Product Design fee</small></div></div>
+    </div>
+  </header>
+
+  <!-- KPIs -->
+  <div class="kpis">
+    <div class="kpi"><div class="n">50<span class="u"> days</span></div><div class="l">Working days (Mon–Fri)</div></div>
+    <div class="kpi"><div class="n">10<span class="u"> wks</span></div><div class="l">Calendar span</div></div>
+    <div class="kpi"><div class="n">8</div><div class="l">Phases</div></div>
+    <div class="kpi"><div class="n">44</div><div class="l">Tasks</div></div>
+    <div class="kpi"><div class="n">7</div><div class="l">Milestones</div></div>
+    <div class="kpi"><div class="n">$370</div><div class="l">Fixed fee · ≈ $7.40 / day</div></div>
+  </div>
+
+  <!-- Progress -->
+  <section>
+    <div class="sec-head"><h2>Overall progress</h2><p>Tick tasks as they complete — progress is saved in this browser.</p></div>
+    <div class="progbar">
+      <div class="track2"><div class="fill2" id="fill"></div></div>
+      <div class="pct" id="pct">0%</div>
+    </div>
+  </section>
+
+  <!-- Gantt -->
+  <section>
+    <div class="sec-head"><h2>Phase timeline</h2><p>10-week overview · each column = 1 week</p></div>
+    <div class="gantt">
+      <div class="weekrow">
+        <div class="corner">Phase</div>
+        <div class="weeks">
+          <span>W1<br>Jul 13</span><span>W2<br>Jul 20</span><span>W3<br>Jul 27</span><span>W4<br>Aug 3</span><span>W5<br>Aug 10</span>
+          <span>W6<br>Aug 17</span><span>W7<br>Aug 24</span><span>W8<br>Aug 31</span><span>W9<br>Sep 7</span><span>W10<br>Sep 14</span>
+        </div>
+      </div>
+      <div id="ganttRows"></div>
+    </div>
+  </section>
+
+  <!-- Detailed tasks -->
+  <section>
+    <div class="sec-head"><h2>Detailed task breakdown</h2><p>44 tasks across 8 phases · dependencies noted</p></div>
+    <div id="phases"></div>
+  </section>
+
+  <!-- Milestones -->
+  <section>
+    <div class="sec-head"><h2>Milestones &amp; sign-offs</h2><p>7 client review gates</p></div>
+    <div class="miles" id="miles"></div>
+  </section>
+
+  <!-- Payment -->
+  <section>
+    <div class="sec-head"><h2>Payment schedule</h2><p>1 prepayment + 7 milestone payments · click a status to change it</p></div>
+
+    <div class="pay-summary">
+      <div class="ps-cell"><div class="ps-l">Total fee</div><div class="ps-n" id="pTotal">$370</div></div>
+      <div class="ps-cell"><div class="ps-l">Paid</div><div class="ps-n paid" id="pPaid">$0</div></div>
+      <div class="ps-cell"><div class="ps-l">In progress</div><div class="ps-n prog" id="pProg">$0</div></div>
+      <div class="ps-cell"><div class="ps-l">Outstanding</div><div class="ps-n out" id="pOut">$370</div></div>
+    </div>
+    <div class="progbar" style="margin:16px 0 22px">
+      <div class="track2"><div class="fill2" id="payFill" style="background:var(--amber)"></div></div>
+      <div class="pct" id="payPct" style="color:var(--amber)">0%</div>
+    </div>
+
+    <div class="phase">
+      <table>
+        <thead><tr>
+          <th>#</th><th>Payment</th><th>Linked to</th><th class="c">Amount</th><th class="c">Status</th>
+        </tr></thead>
+        <tbody id="payRows"></tbody>
+        <tfoot><tr class="pay-foot">
+          <td></td><td colspan="2"><b>Total</b></td><td class="c"><b>$370</b></td><td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin:12px 2px 0">
+      Suggested split — a deposit to start, then a release on each of the 7 milestone sign-offs. Heavier payments sit on the heaviest phases (Hi-fi UI, final delivery). Adjust amounts to taste.
+    </p>
+  </section>
+
+  <div class="note">
+    <b>How to read this sheet.</b> Durations overlap deliberately — e.g. a task ending Aug 5 and the next starting Aug 5 means the second begins as the first wraps, which is normal for a solo designer sequencing work. Dependencies (Dep.) list the task IDs that should be substantially done before starting. Scope is <b>Product Design only</b>; front-end/back-end engineering (Django + DRF, React, deployment) is a separate track and not part of this $370 engagement.
+  </div>
+
+  <footer>
+    <span>Personal Knowledge Platform — Product Design Task Sheet</span>
+    <span>Prepared for Nima Shafiezadeh · by Nima Dorostkar · v1 · Jul 2026</span>
+  </footer>
+</div>
+
+<script>
+const PHASES = [
+  {n:"0", name:"Kickoff &amp; Discovery", range:"Days 1–4 · Jul 13–16", color:"var(--slate)", startDay:1, endDay:4},
+  {n:"1", name:"Research &amp; Strategy", range:"Days 5–10 · Jul 17–24", color:"var(--blue)", startDay:5, endDay:10},
+  {n:"2", name:"Information Architecture", range:"Days 11–16 · Jul 27–Aug 3", color:"var(--violet)", startDay:11, endDay:16},
+  {n:"3", name:"UX Flows &amp; Wireframes", range:"Days 17–24 · Aug 4–13", color:"var(--amber)", startDay:17, endDay:24},
+  {n:"4", name:"Design System Foundations", range:"Days 25–30 · Aug 14–21", color:"var(--rose)", startDay:25, endDay:30},
+  {n:"5", name:"High-Fidelity UI", range:"Days 31–42 · Aug 24–Sep 8", color:"var(--accent)", startDay:31, endDay:42},
+  {n:"6", name:"Prototyping &amp; Validation", range:"Days 43–46 · Sep 9–14", color:"#c2704a", startDay:43, endDay:46},
+  {n:"7", name:"Handoff &amp; Documentation", range:"Days 47–50 · Sep 15–18", color:"var(--ink)", startDay:47, endDay:50},
+];
+
+// id, phase, task, deliverable, startDay, endDay, dateStart, dateEnd, days, dep
+const TASKS = [
+  // Phase 0
+  ["T01",0,"Project kickoff &amp; brief alignment","Kickoff notes, agreed goals &amp; ways of working",1,1,"Jul 13","Jul 13",1,"—"],
+  ["T02",0,"Deep-read blueprint, design direction &amp; tech plan","Annotated understanding + open questions",1,2,"Jul 13","Jul 14",2,"T01"],
+  ["T03",0,"Reference audit — 11 sites, pattern extraction","Reference matrix (Identity / Architecture / Craft)",2,3,"Jul 14","Jul 15",2,"T02"],
+  ["T04",0,"Design goals, constraints &amp; success metrics","One-page design brief",4,4,"Jul 16","Jul 16",1,"T03"],
+  // Phase 1
+  ["T05",1,"Map 7 user/stakeholder groups &amp; needs","Audience &amp; needs map",5,6,"Jul 17","Jul 20",2,"T04"],
+  ["T06",1,"Competitive &amp; inspiration synthesis","Synthesis board + direction rationale",6,7,"Jul 20","Jul 21",2,"T05"],
+  ["T07",1,"Personas + 8 usage scenarios","Personas &amp; scenario walkthroughs",7,8,"Jul 21","Jul 22",2,"T05"],
+  ["T08",1,"Content-type &amp; entity inventory (16 types)","Content inventory &amp; relationships list",8,9,"Jul 22","Jul 23",2,"T07"],
+  ["T09",1,"Design strategy brief + moodboard","Strategy brief &amp; visual moodboard",10,10,"Jul 24","Jul 24",1,"T06,T08"],
+  // Phase 2
+  ["T10",2,"Sitemap &amp; first-level IA","Sitemap diagram",11,12,"Jul 27","Jul 28",2,"T09"],
+  ["T11",2,"Content model &amp; metadata → UI mapping","Field-to-interface mapping",12,13,"Jul 28","Jul 29",2,"T08"],
+  ["T12",2,"Three-pillar policy design (Knowledge/Garden/Archive)","Pillar behaviour &amp; visibility rules",13,14,"Jul 29","Jul 30",2,"T10"],
+  ["T13",2,"Navigation, taxonomy &amp; URL structure","Nav model + taxonomy &amp; URL scheme",14,15,"Jul 30","Jul 31",2,"T10"],
+  ["T14",2,"User flows for 8 key scenarios","Flow diagrams",15,16,"Jul 31","Aug 3",2,"T12,T13"],
+  // Phase 3
+  ["T15",3,"Wireframe — Home","Low-fi Home wireframe",17,18,"Aug 4","Aug 5",2,"T14"],
+  ["T16",3,"Wireframe — Garden note + maturity states","Note page + seedling→evergreen states",18,19,"Aug 5","Aug 6",2,"T14"],
+  ["T17",3,"Wireframe — Project &amp; Archive pages","Project + archive browse/entry wireframes",19,20,"Aug 6","Aug 7",2,"T14"],
+  ["T18",3,"Wireframe — Knowledge editor (private)","Capture/edit interface wireframe",20,21,"Aug 7","Aug 10",2,"T14"],
+  ["T19",3,"Wireframe — Search &amp; Graph/discovery","Search results + graph view wireframes",21,22,"Aug 10","Aug 11",2,"T16"],
+  ["T20",3,"Wireframe — About / Collaboration / Contact","Static-page wireframes",22,23,"Aug 11","Aug 12",2,"T15"],
+  ["T21",3,"Wireframe review &amp; iteration","Revised wireframe set",23,24,"Aug 12","Aug 13",2,"T15,T16,T17,T18,T19,T20"],
+  // Phase 4
+  ["T22",4,"Typography scale &amp; long-form reading system","Type tokens + reading spec (65–75ch)",25,26,"Aug 14","Aug 17",2,"T21"],
+  ["T23",4,"Color tokens + light/dark mode","Color system (both modes first-class)",26,27,"Aug 17","Aug 18",2,"T22"],
+  ["T24",4,"Spacing, grid &amp; layout system","Spacing scale &amp; grid rules",27,28,"Aug 18","Aug 19",2,"T22"],
+  ["T25",4,"Core components (nav, cards, links, backlinks, tags)","Component library v1",28,29,"Aug 19","Aug 20",2,"T23,T24"],
+  ["T26",4,"Maturity &amp; pillar visual language","Pillar/maturity component states",29,30,"Aug 20","Aug 21",2,"T25"],
+  // Phase 5
+  ["T27",5,"Hi-fi — Home (light + dark)","Final Home design",31,32,"Aug 24","Aug 25",2,"T26"],
+  ["T28",5,"Hi-fi — Garden note + backlinks","Final note page",33,34,"Aug 26","Aug 27",2,"T26"],
+  ["T29",5,"Hi-fi — Article / essay page","Final long-form reading page",34,35,"Aug 27","Aug 28",2,"T28"],
+  ["T30",5,"Hi-fi — Project page + gallery","Final project page",35,36,"Aug 28","Aug 31",2,"T27"],
+  ["T31",5,"Hi-fi — Archive browse + entry","Final archive designs",36,37,"Aug 31","Sep 1",2,"T30"],
+  ["T32",5,"Hi-fi — Knowledge editor","Final private editor design",38,39,"Sep 2","Sep 3",2,"T28"],
+  ["T33",5,"Hi-fi — Search results + filters","Final search design",39,40,"Sep 3","Sep 4",2,"T29"],
+  ["T34",5,"Hi-fi — Graph / discovery view","Final graph/discovery design",40,41,"Sep 4","Sep 7",2,"T33"],
+  ["T35",5,"Hi-fi — About / Collaboration / Contact","Final static pages",41,41,"Sep 7","Sep 7",1,"T27"],
+  ["T36",5,"Responsive — mobile &amp; tablet adaptations","Responsive variants of key screens",42,42,"Sep 8","Sep 8",1,"T34,T35"],
+  // Phase 6
+  ["T37",6,"Interactive prototype wiring","Clickable prototype",43,44,"Sep 9","Sep 10",2,"T36"],
+  ["T38",6,"Micro-interactions &amp; motion spec","Motion &amp; interaction spec",44,45,"Sep 10","Sep 11",2,"T37"],
+  ["T39",6,"Usability review + accessibility (WCAG 2.1 AA)","Findings + a11y checklist",45,46,"Sep 11","Sep 14",2,"T37"],
+  ["T40",6,"Design revisions from feedback","Revised, validated designs",46,46,"Sep 14","Sep 14",1,"T39"],
+  // Phase 7
+  ["T41",7,"Developer handoff spec (tokens, components, states)","Handoff spec sheet",47,48,"Sep 15","Sep 16",2,"T40"],
+  ["T42",7,"Design documentation &amp; usage guidelines","Design system docs",48,49,"Sep 16","Sep 17",2,"T41"],
+  ["T43",7,"Asset export &amp; design-file cleanup","Organized files + exported assets",49,49,"Sep 17","Sep 17",1,"T41"],
+  ["T44",7,"Final walkthrough &amp; project sign-off","Handoff session + sign-off",50,50,"Sep 18","Sep 18",1,"T42,T43"],
+];
+
+const MILES = [
+  ["M1","Discovery sign-off","Research, personas &amp; strategy agreed","Jul 24 · Day 10"],
+  ["M2","IA approved","Sitemap, content model, flows locked","Aug 3 · Day 16"],
+  ["M3","Wireframes approved","All key screens wireframed &amp; iterated","Aug 13 · Day 24"],
+  ["M4","Design System v1","Type, color, grid &amp; components ready","Aug 21 · Day 30"],
+  ["M5","Hi-fi UI complete","All screens designed + responsive","Sep 8 · Day 42"],
+  ["M6","Prototype validated","Prototype, motion &amp; a11y pass done","Sep 14 · Day 46"],
+  ["M7","Final delivery","Handoff, docs &amp; sign-off","Sep 18 · Day 50"],
+];
+
+const TOTAL_DAYS = 50;
+function pctPos(day){ return ((day-1)/TOTAL_DAYS)*100; }
+function pctWidth(s,e){ return ((e-s+1)/TOTAL_DAYS)*100; }
+
+// Gantt
+document.getElementById("ganttRows").innerHTML = PHASES.map(p=>{
+  const left = pctPos(p.startDay), w = pctWidth(p.startDay,p.endDay);
+  return `<div class="grow">
+    <div class="lab"><span class="dot" style="background:${p.color}"></span>P${p.n} · ${p.name}</div>
+    <div class="track"><div class="bar" style="left:${left}%;width:${w}%;background:${p.color}">${p.endDay-p.startDay+1}d</div></div>
+  </div>`;
+}).join("");
+
+// Phase tables
+document.getElementById("phases").innerHTML = PHASES.map((p,pi)=>{
+  const rows = TASKS.filter(t=>t[1]===pi).map(t=>{
+    const [id,,task,deliv,,,ds,de,days,dep]=t;
+    return `<tr data-id="${id}">
+      <td class="c"><input type="checkbox" class="chk" data-id="${id}"></td>
+      <td class="tid">${id}</td>
+      <td><div class="ttask">${task}</div><div class="tdeliv">↳ ${deliv}</div></td>
+      <td class="col-date">${ds}<small>→ ${de}</small></td>
+      <td class="c"><span class="dur">${days}d</span></td>
+      <td class="dep hide-sm">${dep}</td>
+    </tr>`;
+  }).join("");
+  return `<div class="phase">
+    <div class="phase-head">
+      <span class="pnum" style="background:${p.color}">${p.n}</span>
+      <h3>${p.name}</h3>
+      <div class="prange"><b>${p.range.split(' · ')[0]}</b><br>${p.range.split(' · ')[1]}</div>
+    </div>
+    <table>
+      <thead><tr>
+        <th class="c">✓</th><th>ID</th><th>Task &amp; deliverable</th><th>Dates</th><th class="c">Dur.</th><th class="hide-sm">Dep.</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}).join("");
+
+// Milestones
+document.getElementById("miles").innerHTML = MILES.map(m=>`
+  <div class="mile">
+    <span class="star">★</span>
+    <div class="mname">${m[0]} — ${m[1]}<small>${m[2]}</small></div>
+    <div class="mdate">${m[3]}</div>
+  </div>`).join("");
+
+// Progress + persistence
+const KEY="pkp_taskstate_v1";
+function load(){ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return {}} }
+function save(s){ try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){} }
+function refresh(){
+  const boxes=[...document.querySelectorAll(".chk")];
+  const done=boxes.filter(b=>b.checked).length;
+  const pct=Math.round(done/boxes.length*100);
+  document.getElementById("fill").style.width=pct+"%";
+  document.getElementById("pct").textContent=pct+"%";
+}
+const state=load();
+document.querySelectorAll(".chk").forEach(b=>{
+  const id=b.dataset.id;
+  if(state[id]){ b.checked=true; b.closest("tr").classList.add("done"); }
+  b.addEventListener("change",()=>{
+    state[id]=b.checked; save(state);
+    b.closest("tr").classList.toggle("done",b.checked);
+    refresh();
+  });
+});
+refresh();
+
+// ---- Payments ----
+// id, label, linkedTo, amount
+const PAYMENTS = [
+  ["P0","Prepayment (deposit)","On kickoff · Jul 13",70],
+  ["P1","Milestone M1","Discovery sign-off · Jul 24",35],
+  ["P2","Milestone M2","IA approved · Aug 3",35],
+  ["P3","Milestone M3","Wireframes approved · Aug 13",45],
+  ["P4","Milestone M4","Design System v1 · Aug 21",45],
+  ["P5","Milestone M5","Hi-fi UI complete · Sep 8",55],
+  ["P6","Milestone M6","Prototype validated · Sep 14",35],
+  ["P7","Milestone M7","Final delivery · Sep 18",50],
+];
+const STATUSES = [
+  {key:"unpaid", cls:"s-unpaid", label:"Not paid"},
+  {key:"prog",   cls:"s-prog",   label:"In progress"},
+  {key:"paid",   cls:"s-paid",   label:"Paid"},
+];
+const PKEY="pkp_paystate_v1";
+function pLoad(){ try{return JSON.parse(localStorage.getItem(PKEY))||{}}catch(e){return {}} }
+function pSave(s){ try{localStorage.setItem(PKEY,JSON.stringify(s))}catch(e){} }
+const payState=pLoad();
+
+document.getElementById("payRows").innerHTML = PAYMENTS.map((p,i)=>{
+  const [id,label,linked,amt]=p;
+  return `<tr data-pid="${id}" id="prow-${id}">
+    <td class="pnum-sm">${i===0?"—":"M"+i}</td>
+    <td><b>${label}</b></td>
+    <td style="color:var(--ink-soft);font-size:12.5px">${linked}</td>
+    <td class="c pay-amt">$${amt}</td>
+    <td class="c"><button class="status-btn" data-pid="${id}"><span class="sdot"></span><span class="stxt"></span></button></td>
+  </tr>`;
+}).join("");
+
+function money(n){ return "$"+n; }
+function applyPay(){
+  let paid=0, prog=0;
+  PAYMENTS.forEach(p=>{
+    const [id,,,amt]=p;
+    const st = payState[id]||"unpaid";
+    const s = STATUSES.find(x=>x.key===st);
+    const btn = document.querySelector(`.status-btn[data-pid="${id}"]`);
+    btn.className = "status-btn "+s.cls;
+    btn.querySelector(".stxt").textContent = s.label;
+    const row = document.getElementById("prow-"+id);
+    row.classList.toggle("row-paid", st==="paid");
+    if(st==="paid") paid+=amt; else if(st==="prog") prog+=amt;
+  });
+  const total=370, out=total-paid;
+  document.getElementById("pPaid").textContent=money(paid);
+  document.getElementById("pProg").textContent=money(prog);
+  document.getElementById("pOut").textContent=money(out);
+  const pct=Math.round(paid/total*100);
+  document.getElementById("payFill").style.width=pct+"%";
+  document.getElementById("payPct").textContent=pct+"%";
+}
+document.querySelectorAll(".status-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const id=btn.dataset.pid;
+    const cur=payState[id]||"unpaid";
+    const idx=STATUSES.findIndex(x=>x.key===cur);
+    payState[id]=STATUSES[(idx+1)%STATUSES.length].key;
+    pSave(payState); applyPay();
+  });
+});
+applyPay();
+</script>
+</body>
+</html>
