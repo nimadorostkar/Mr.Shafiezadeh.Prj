@@ -1,6 +1,7 @@
 # Technical Development Plan
 ### Personal Knowledge · Digital Garden · Personal Archive — Python Backend Edition
 
+
 > **A note on this architecture.** The main proposal argued for a Markdown-in-Git / Astro stack because *content longevity* and *zero capture friction* are the core problem. This document instead lays out a **Python (Django + DRF) backend**, as requested. That's a fully valid path — especially when the team's home turf is Django — but it trades some "content outlives code" purity for a dynamic, API-driven system. The plan below keeps the good parts of the original (Markdown as the real content format, a guaranteed export path) *while* giving you a proper Python backend. The tension is called out where it matters, not hidden.
 
 ---
@@ -174,3 +175,4 @@ An Iranian VPS gives you low local latency and easy ریال billing, at the cos
 ## 6. One-line summary
 
 A **Django + DRF + Postgres** backend, **React** front-end, **Markdown-in-Git** as the canonical (and exportable) content layer, **Celery/Redis** for the graph and media work, packaged in **Docker Compose** and deployed to an **Iranian VPS** with mirror-based builds and off-box content backups — one content graph, three editorial policies, built on infrastructure you own and can always walk away from.
+
